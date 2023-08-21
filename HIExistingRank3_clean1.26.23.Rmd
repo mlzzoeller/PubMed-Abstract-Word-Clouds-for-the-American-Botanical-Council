@@ -1,0 +1,482 @@
+---
+title: "HI Existing Entries Rank 3 Updates"
+author: "Madeleine Zoeller"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+Purpose: Make word clouds from PubMed abstracts to facilitate encyclopedia entry research for the American Botanical Council
+#Set up
+##Restart
+```{r}
+rm(list= ls())
+```
+
+##Library
+```{r}
+library(tidyverse)
+library(tm)
+library(PubMedWordcloud)
+library(easyPubMed)
+library(readxl)
+
+sessionInfo()
+getwd()
+```
+
+##Documentation
+###PubMedWordcloud info
+
+https://cran.r-project.org/web/packages/PubMedWordcloud/PubMedWordcloud.pdf
+
+###easyPubMed info
+
+https://cran.r-project.org/web/packages/easyPubMed/vignettes/getting_started_with_easyPubMed.html
+
+https://www.data-pulse.com/projects/Rlibs/vignettes/easyPubMed_02_advanced_tutorial.html
+
+Full documentation
+
+https://cran.r-project.org/web/packages/easyPubMed/easyPubMed.pdf
+
+
+#Existing entries, binned by quality/re-write priority
+
+
+
+Existing entries:
+
+-Original length was 108 entries, but I had to separate Bitter Orange, Neroli, Petitgrain and Tea (Green and Black) for coding purposes
+
+-1(highest quality/low rewrite priority) to 3(lowest quality/high rewrite priority)
+
+###Read-in
+```{r}
+hiranked <- read_excel("Hirankedv2.xlsx")
+
+#will be transformed to lowercase for coding/processing purposes
+
+View(hiranked)
+
+#comName= common name
+
+```
+
+##Ranks
+###Rank 1, n=38
+```{r}
+hiR1 <- hiranked %>% filter(rank== 1)
+
+hiR1
+```
+
+###Rank 2, n=32
+```{r}
+hiR2 <- hiranked %>% filter(rank== 2)
+
+hiR2
+```
+
+###Rank 3, n=35
+```{r}
+hiR3 <- hiranked %>% filter(rank== 3)
+
+hiR3
+```
+
+#Literature reviews for Rank 3 items
+###Tidy up before starting
+```{r}
+rm(hiR1)
+rm(hiR2)
+rm(hiranked)
+
+hiR3 <- hiR3$comName
+hiR3 <- tolower(hiR3)
+```
+
+#HI Ingredients in Rank 3
+##Astaxanthin 
+###P1, astaxanthin AND review
+```{r}
+x = getPMIDsByKeyWords(keys = "astaxanthin AND review", dFrom=2005, dTo=2023)
+
+abstracts = getAbstracts(x)
+
+cleanAbs = cleanAbstracts(abstracts)
+
+pt1_astRev <- plotWordCloud(cleanAbs, min.freq = 4, scale = c(3, 0.3), max.words = 100)
+
+#potential search 2 words: cancer, carotenoid, antioxidant, inflammmation, antiinflammatory oxidative, neurodegenerative, algae, microalgae, liver, nafld, lipid, fatty
+
+
+#choose: cancer, neurodegenerative, inflammation, antioxidant, carotenoid, liver
+
+```
+
+###P2: astaxanthin AND review AND cancer
+```{r}
+x = getPMIDsByKeyWords(keys = "astaxanthin AND review AND cancer", dFrom=2005, dTo=2023)
+
+abstracts = getAbstracts(x)
+
+cleanAbs = cleanAbstracts(abstracts, yrWords = exw)
+
+pt2_astRev <- plotWordCloud(cleanAbs, min.freq = 4, scale = c(2, 0.3), max.words = 100)
+
+#new search words: lung, lycopene, diabetes, xanthophylls, fucoxanthin, eye, immune, skin, gastric, cognitive
+
+
+
+class(exw)
+is.vector(exw)
+
+
+#words to exclude
+
+exw <- c("disease", "diseases", "study", "treatment", "review", "health", "however", "including", "drugs","disorder","disorders", "used", "use", "using", "several", "can", "well", "also", "research", "elsevier", "studies","can", "shown", "one", "due", "will", "evidence", "current", "increased", "associated", "high", "present", "different", "showed", "play", "found", "reported", "rights", "effects", "effect", "recent")
+
+
+
+```
+###P3, astaxanthin AND review AND neurodegenerative
+```{r}
+x = getPMIDsByKeyWords(keys = "astaxanthin AND review AND neurodegenerative", dFrom=2005, dTo=2023)
+
+abstracts = getAbstracts(x)
+
+cleanAbs = cleanAbstracts(abstracts, yrWords = exw)
+
+pt3_astRev <- plotWordCloud(cleanAbs, min.freq = 4, scale = c(2, 0.3), max.words = 100)
+
+#note lack of punctuation
+#new words of interest: neuroinflammation, alzheimers, parkinsons, neuroprotective, mitochondrial, stress, gutbrain, renal, eye, apoptosis, mitophagy, klotho, chronic
+```
+
+###P4, astaxanthin AND review AND neurodegenerative AND apoptosis
+```{r}
+x = getPMIDsByKeyWords(keys = "astaxanthin AND review AND neurodegenerative AND apoptosis", dFrom=2005, dTo=2023)
+
+abstracts = getAbstracts(x)
+
+cleanAbs = cleanAbstracts(abstracts, yrWords = exw)
+
+pt4_astRev <- plotWordCloud(cleanAbs, min.freq = 4, scale = c(2, 0.3), max.words = 100)
+
+#note lack of punctuation
+#new words of interest: neuroinflammation, alzheimers, parkinsons, neuroprotective, mitochondrial, stress, gutbrain, renal, eye, apoptosis, mitophagy, klotho, chronic
+
+#fibrosis, pikakt, fgf
+
+```
+###P5,astaxanthin AND review AND future AND directions 2020-present
+
+```{r}
+x = getPMIDsByKeyWords(keys = "astaxanthin AND review AND future AND directions", dFrom=2020, dTo=2023)
+
+#x2 = list(x)
+#use as list and feed into code example from easyPubMed above?
+abstracts = getAbstracts(x)
+
+cleanAbs = cleanAbstracts(abstracts, yrWords = exw)
+
+pt5_astRev <- plotWordCloud(cleanAbs, min.freq = 4, scale = c(2, 0.3), max.words = 100)
+
+#Relevant words: biorefinery, sustainable, solvents, pluvialis
+```
+
+
+
+```{r}
+hiR3
+```
+
+###Astaxanthin and Safety
+```{r}
+
+x = getPMIDsByKeyWords(keys = "astaxanthin AND safety", dFrom=2020, dTo=2023)
+
+abstracts = getAbstracts(x)
+
+cleanAbs = cleanAbstracts(abstracts, yrWords = exw)
+
+pt6_astSafe <- plotWordCloud(cleanAbs, min.freq = 4, scale = c(3, 0.6), max.words = 100)
+
+#look into
+#embryos, glucose, haematococcus, toxicity, zebrafish, knee, bioavailability, concentrations, extraction, shrimp
+```
+
+
+###Astaxanthin and Sustainability
+```{r}
+x = getPMIDsByKeyWords(keys = "astaxanthin AND safety", dFrom=2020, dTo=2023)
+
+abstracts = getAbstracts(x)
+
+cleanAbs = cleanAbstracts(abstracts, yrWords = exw)
+
+pt7_astSustain <- plotWordCloud(cleanAbs, min.freq = 4, scale = c(3, 0.6), max.words = 100)
+
+#look into
+#pluvialis, knee, shrimp, 
+```
+
+
+
+##Beet
+###P1, beet AND review
+```{r}
+
+x = getPMIDsByKeyWords(keys = "beet AND review", dFrom=2005, dTo=2023)
+
+abstracts = getAbstracts(x)
+
+cleanAbs = cleanAbstracts(abstracts)
+
+pt1_beetRev <- plotWordCloud(cleanAbs, min.freq = 4, scale = c(1, 0.3), max.words = 100)
+
+
+```
+
+###P2, beet AND review (minus previous exw list)
+```{r}
+
+x = getPMIDsByKeyWords(keys = "beet AND review", dFrom=2005, dTo=2023)
+
+abstracts = getAbstracts(x)
+
+cleanAbs = cleanAbstracts(abstracts, yrWords = exw)
+
+pt2_beetRev <- plotWordCloud(cleanAbs, min.freq = 4, scale = c(1, 0.3), max.words = 100)
+
+#acne vulgaris, betalains, nitrate, blood, cardiovascular, beetroot, sugar, sulopenem, antioxidant, regulatory, virus, acid, pectin
+
+#adding to excluded words list (exw)
+#including, related, following, identified, human, patients, important, factors, beneficial, published, benefits, properties, new
+
+#borderline exw....various, many
+```
+###new set of excluded words
+```{r}
+exw <- c("disease", "diseases", "study", "treatment", "review", "health", "however", "including", "drugs","disorder","disorders", "used", "use", "using", "several", "can", "well", "also", "research", "elsevier", "studies","can", "shown", "one", "due", "will", "evidence", "current", "increased", "high", "present", "different", "showed", "play", "found", "reported", "rights", "effects", "effect", "recent"
+         #start of beet additions
+         ,"including","related", "following", "identified", "human", "patients", "important", "factors", "beneficial", "published", "benefits", "properties", "new")
+```
+
+###P3, beet AND review AND acne
+```{r}
+x = getPMIDsByKeyWords(keys = "beet AND review AND acne", dFrom=2005, dTo=2023)
+
+abstracts = getAbstracts(x)
+
+cleanAbs = cleanAbstracts(abstracts, yrWords = exw)
+
+pt3_beetRev <- plotWordCloud(cleanAbs, min.freq = 4, scale = c(3, 0.3), max.words = 100)
+
+#words of interest: skin, isotretinoin, cancer, sebocyte, keratinocyte, immunomodulatory, inflammation, rosacea, antibiotics, psoriasis, curcumin, oral, lesions, adp, cosmetic, peptides, amps, systemic, insulinotropic, combination, milk, sabaceous, retinoids, neutrophils
+
+#decided to remove associated from exw list, this indicates the type of evidence that exists
+```
+
+##Bergamot
+###excluded words
+```{r}
+exw <- c("disease", "diseases", "study", "treatment", "review", "health", "however", "including", "drugs","disorder","disorders", "used", "use", "using", "several", "can", "well", "also", "research", "elsevier", "studies","can", "shown", "one", "due", "will", "evidence", "current", "increased", "high", "present", "different", "showed", "play", "found", "reported", "rights", "effects", "effect", "recent"
+         #start of beet additions
+         ,"including","related", "following", "identified", "human", "patients", "important", "factors", "beneficial", "published", "benefits", "properties", "new"
+         #start of bergamot additions
+         , "studies")
+```
+
+###P1, bergamot AND review
+```{r}
+
+x = getPMIDsByKeyWords(keys = "bergamot AND review", dFrom=2005, dTo=2023)
+
+abstracts = getAbstracts(x)
+
+cleanAbs = cleanAbstracts(abstracts)
+
+pt1_bergRev <- plotWordCloud(cleanAbs, min.freq = 4, scale = c(3, 0.3), max.words = 100)
+
+#words of interest: linalool, carvacrol, cholesterol, citrus, volatile, bergamia, beo, cardiovascular, aromatherapy, antiinflammatory, yeast, lipoprotein
+```
+
+
+
+
+####For later PubMed bergamot and review csv download
+```{r}
+bergCSV <- read.xl("")
+```
+
+
+
+###P2, bergamot AND review, exw
+```{r}
+
+x = getPMIDsByKeyWords(keys = "bergamot AND review", dFrom=2005, dTo=2023)
+
+abstracts = getAbstracts(x)
+
+cleanAbs = cleanAbstracts(abstracts, yrWords = exw)
+
+pt1_bergRev <- plotWordCloud(cleanAbs, min.freq = 4, scale = c(3, 0.3), max.words = 100)
+
+
+#words of interest: bergamia, LDL, stress, naringenin, yeast, juice, safety, statins, lipid lowering, cancer, anticancer, auraantium, antimicrobial, neuropathic, HDLC, carvacrol, linalool, rice, eos, berberine, anxiety, antiinflammatory, artichoke, orange, cholesterol, volatile, beo, red, citrus, metabolism
+```
+##Trying something else
+
+
+-maybe I need to separate this into steps?
+-starting with vector...or list? of my HI ingredients 
+-then I want a ____loop? something in the apply family? that will write out the keys = part "[element in list or vector of HI ingredients] AND review" 
+
+What if I try to pipe these together and then try to use a loop to go through my list?
+```{r}
+#remember to add in yrWords = exc  for clean abstracts in another version of this 
+
+#going to test this with a much smaller search b/c I am trying this on the train (did not need to it turns out)
+x = getPMIDsByKeyWords(keys = "bergamot AND review", dFrom=2005, dTo=2023)
+
+#maybe each of the arguments above for getPMIDsByKeyWords() could have its own column?
+#dataframe ...colNames = keys(created before, example value for the Bergamot row, e.g."bergamot AND review"), dFrom, dTo
+
+
+#----(the x= part?) 
+
+#would need a way to do this that does not just write over each existing version of x?
+
+#also would prefer if it can name each x equivalent in way that shows it is a list of PMIDs for a certain HI ingredient, e.g. beetPMIDs
+
+#maybe I can use mutate?
+
+
+#below worked!
+x %>% getAbstracts() %>% cleanAbstracts() %>% plotWordCloud(min.freq = 4, scale = c(3, 0.3), max.words = 100)
+
+```
+Words version of the loop I would want (or maybe lapply, that might be faster?)
+
+-For each value in list or vector of HI ingredient names, feed that value into the keys= argument within the function getPMIDsByKeywords and create a new column with the output of the function getPMIDsByKeywords in the same dataframe as my HI list or vector; then, pass the x equivalent for each value (common name)
+
+dataframe....list?- first column is just the HI common name, the next column is "[HI item] AND review" and the third column is equivalent to x above (the output of getPMIDsByKeywords)
+
+-maybe that list or vector should just say "[HI item] AND review"
+
+##Cassava
+###P1, Cassava and review
+```{r}
+x = getPMIDsByKeyWords(keys = "cassava AND review", dFrom=2005, dTo=2023)
+
+abstracts = getAbstracts(x)
+
+cleanAbs = cleanAbstracts(abstracts)
+
+pt1_cassRev <- plotWordCloud(cleanAbs, min.freq = 4, scale = c(3, 0.3), max.words = 100)
+
+#words of interest: security, genetic, maize, potato, starch, roots, cyanide, manihot, africa, alzheimer's
+```
+###P2, Cassava and review, exw
+```{r}
+x = getPMIDsByKeyWords(keys = "cassava AND review", dFrom=2005, dTo=2023)
+
+abstracts = getAbstracts(x)
+
+cleanAbs = cleanAbstracts(abstracts, yrWords = exw)
+
+pt2_cassRev <- plotWordCloud(cleanAbs, min.freq = 4, scale = c(3, 0.3), max.words = 100)
+
+#words of interest: cyanide, alzheimer's, drug, resistance, sustainable, environmental, virus, risk, flour, konzo, wheat, rice, sweet, tropical, tuber, staple
+
+```
+
+###excluded words
+```{r}
+exw <- c("disease", "diseases", "study", "treatment", "review", "health", "however", "including", "drugs","disorder","disorders", "used", "use", "using", "several", "can", "well", "also", "research", "elsevier", "studies","can", "shown", "one", "due", "will", "evidence", "current", "increased", "high", "present", "different", "showed", "play", "found", "reported", "rights", "effects", "effect", "recent"
+         #start of beet additions
+         ,"including","related", "following", "identified", "human", "patients", "important", "factors", "beneficial", "published", "benefits", "properties", "new"
+         #start of bergamot additions
+         , "studies",
+         #cassava additions
+         "included", "many", "countries", "results", "information", "need", "understanding", "provide", "developing", "people", "knowledge", "reserved", "among","method","authors","key","literature")
+```
+
+
+##Coconut
+
+###P1, Coconut and review
+```{r}
+x = getPMIDsByKeyWords(keys = "coconut AND review", dFrom=2005, dTo=2023)
+
+abstracts = getAbstracts(x)
+
+cleanAbs = cleanAbstracts(abstracts)
+
+pt1_coconRev <- plotWordCloud(cleanAbs, min.freq = 4, scale = c(3, 0.3), max.words = 100)
+```
+###P2, Coconut and review, exw
+```{r}
+x = getPMIDsByKeyWords(keys = "coconut AND review", dFrom=2005, dTo=2023)
+
+abstracts = getAbstracts(x)
+
+cleanAbs = cleanAbstracts(abstracts, yrWords = exw)
+
+pt2_coconRev <- plotWordCloud(cleanAbs, min.freq = 4, scale = c(3, 0.3), max.words = 100)
+
+#words of interest: cardiovascular, cholesterol, antioxidant, environmental, herbs, olive, waste, poria
+
+
+#try to add ggsave because it isn't allowing me to right click the way I could before....
+
+x %>% getAbstracts() %>% cleanAbstracts() %>% plotWordCloud(min.freq = 4, scale = c(3, 0.3), max.words = 100)
+
+#words of interest: waste, skin, cardiovascular, olive (presumably comparisons with olive oil), poria, rice, antioxidant, preventative, cholesterol, saturated, environmental, energy 
+```
+
+###excluded words
+```{r}
+exw <- c("disease", "diseases", "study", "treatment", "review", "health", "however", "including", "drugs","disorder","disorders", "used", "use", "using", "several", "can", "well", "also", "research", "elsevier", "studies","can", "shown", "one", "due", "will", "evidence", "current", "increased", "high", "present", "different", "showed", "play", "found", "reported", "rights", "effects", "effect", "recent"
+         #start of beet additions
+         ,"including","related", "following", "identified", "human", "patients", "important", "factors", "beneficial", "published", "benefits", "properties", "new"
+         #start of bergamot additions
+         , "studies",
+         #cassava additions
+         "included", "many", "countries", "results", "information", "need", "understanding", "provide", "developing", "people", "knowledge", "reserved", "among","method","authors","key","literature",
+         #coconut addition
+         "therefore", "methods")
+```
+
+
+##Cranberry
+##Cucumber
+##Damask rose
+##English walnut
+##Eucalyptus
+##Fennel
+##Frankincense
+##Grape leaf
+##Grapefruit
+##Guar gum
+##Hops
+##Hyssop
+##Jojoba
+##Madder
+##Mallows
+##Tangerine
+##Marjoram
+##Mugwort
+##Myrrh
+##Patchouli
+##Peppermint
+##Rice
+##Roman chamomile
+##Sandalwood
+##Sweet almond
+##Black tea
+##Turmeric
+##Vetiver
+##Wheat germ
+##Ylang ylang
